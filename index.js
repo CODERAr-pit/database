@@ -1,16 +1,21 @@
 let express =require("express");
 
-let mongoose=require("mongoose");
-let app=express();
-app.use(express.json());
-const sendMail= require("./mailer");
-require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
+const token = '7785442298:AAHpQxkVCxu0iaPIEOe42LurZ7xsSjPo0wc'; 
+const bot = new TelegramBot(token, { polling: true });
 
+let mongoose=require("mongoose");
 let connectionnmodle=require("./connection");
 
+let app=express();
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const sendMail= require("./mailer");
 const bcrypt = require('bcrypt');
+
+require('dotenv').config();
+
 
 app.post("/query-insert", async (req, res) => {
     try {
@@ -35,6 +40,18 @@ app.post("/query-insert", async (req, res) => {
             phone:${phone},
             dob:${dob}  .`);
         res.send("Submitted and email sent!");
+   
+         // bot
+        const chatId = 5544273570; 
+        const message = `
+        *New Form Submission*
+         Username: ${username}
+         Email: ${email}
+         Phone: ${phone}
+         DOB: ${dob}
+    `;
+
+    await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
     }  
        catch (err) {
         res.send({
